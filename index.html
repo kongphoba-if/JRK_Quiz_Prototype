@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JORAKAY EXPERT PAVILION | Challenge</title>
+    <title>JORAKAY EXPERT PAVILION</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        /* 1. Fix Body & Viewport */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, system-ui, sans-serif; background: #fff; }
+        :root {
+            --jrk-green: #2E7D32;      /* Primary Emerald */
+            --jrk-dark: #1A3317;       /* Deep Forest */
+            --jrk-light: #F1F8F1;      /* Mint Tint */
+            --jrk-accent: #4CAF50;     /* Vibrant Leaf */
+        }
+
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #fff; }
         
         model-viewer { 
             width: 100%; height: 100%; display: block; 
-            background: radial-gradient(circle, #ffffff 0%, #f0f0f0 100%); 
+            background: radial-gradient(circle, #ffffff 0%, #e8eee8 100%); 
         }
 
-        /* 2. Floating UI Panel - Lifted for Mobile Navigation */
+        /* UI Panel - Lifted for Mobile Gesture Nav */
         .ui-panel {
             position: absolute; 
-            bottom: calc(50px + env(safe-area-inset-bottom)); /* Lifted for gesture nav */
+            bottom: calc(40px + env(safe-area-inset-bottom));
             left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 30px;
             box-shadow: 0 15px 45px rgba(0,0,0,0.1); width: 340px; max-width: 85vw; text-align: center; 
@@ -28,83 +34,88 @@
         .button-group { display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; }
         .mode-btn {
             background: #eee; border: none; padding: 12px; border-radius: 18px;
-            font-size: 11px; font-weight: 800; cursor: pointer; color: #666; flex: 1;
+            font-size: 11px; font-weight: 800; cursor: pointer; color: #666; flex: 1; transition: 0.3s;
         }
-        .mode-btn.active { background: #000; color: white; }
+        .mode-btn.active { background: var(--jrk-dark); color: white; }
 
         #quiz-trigger {
-            width: 100%; background: #FF6B00; color: white; border: none; padding: 16px;
+            width: 100%; background: var(--jrk-green); color: white; border: none; padding: 16px;
             border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3); transition: 0.3s;
         }
+        #quiz-trigger:hover { background: var(--jrk-dark); }
 
-        /* 3. Modal Overlay - Allow Scrolling */
+        /* Modal Overlay - Scrollable for Mobile */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.8); z-index: 2000; 
-            overflow-y: auto; /* ALLOWS SCROLLING ON TALL FORMS */
-            -webkit-overflow-scrolling: touch;
-            padding: 20px 0; /* Space at top/bottom for mobile */
+            background: rgba(0,0,0,0.85); z-index: 2000; 
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding: 40px 0;
         }
 
-        /* Modal Card - Responsive Height */
+        /* Modal Content Card */
         .modal-content { 
             background: white; border-radius: 40px; width: 92%; max-width: 850px; 
-            margin: auto; /* Centers the card when scrolling is active */
-            display: flex; flex-direction: row; overflow: hidden;
-            position: relative; box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+            margin: auto; display: flex; flex-direction: row; overflow: hidden;
+            position: relative; box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Mobile Layout Adjustments */
         @media (max-width: 750px) {
-            .modal-content { flex-direction: column; max-width: 450px; width: 90%; }
-            .modal-left { padding: 30px 20px !important; }
-            .modal-right { padding: 30px 20px !important; text-align: center !important; }
+            .modal-content { flex-direction: column; max-width: 450px; }
+            .modal-right { padding: 40px 25px !important; }
+            .modal-left { padding: 40px 20px !important; }
         }
 
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #333; z-index: 10; opacity: 0.5; }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Left Panel - Forced White */
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #999; z-index: 10; transition: 0.3s; }
+        .close-btn:hover { color: var(--jrk-green); }
+
+        /* LEFT SIDE: Pure White Prize Side */
         .modal-left { 
-            flex: 1.2; background: #ffffff; /* BOTH SIDES NOW WHITE */
-            display: flex; justify-content: center; align-items: center; padding: 40px;
+            flex: 1.2; background: #ffffff;
+            display: flex; justify-content: center; align-items: center; padding: 50px;
             box-sizing: border-box; 
         }
         
         .modal-left img {
-            width: 100%; max-width: 320px; height: auto;
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));
+            width: 100%; max-width: 380px; height: auto;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
         }
 
-        /* Right Panel - Forced White */
+        /* RIGHT SIDE: Darker Form Side */
         .modal-right { 
-            flex: 1; padding: 50px 40px; box-sizing: border-box; text-align: left;
+            flex: 1; padding: 60px 45px; box-sizing: border-box; text-align: left;
             display: flex; flex-direction: column; justify-content: center;
-            background: #ffffff; border-left: 1px solid #f0f0f0;
+            background: var(--jrk-dark); /* DARK THEME FOR FORM */
+            color: #ffffff;
         }
+
+        .modal-right h2 { color: var(--jrk-accent); font-size: 28px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
+        .modal-right p { font-size: 14px; color: #b0cbb0; line-height: 1.6; margin-bottom: 25px; }
         
         input { 
-            width: 100%; padding: 16px; margin: 10px 0; border: 1px solid #eee; 
-            border-radius: 16px; box-sizing: border-box; background: #fcfcfc; 
-            font-size: 16px; -webkit-appearance: none; /* Prevents iOS zoom */
+            width: 100%; padding: 16px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); 
+            font-size: 16px; color: white; outline: none;
         }
+        input::placeholder { color: #668366; }
+        input:focus { border-color: var(--jrk-accent); background: rgba(255,255,255,0.1); }
         
         #submit-btn { 
-            width: 100%; background: #FF6B00; color: white; border: none; 
+            width: 100%; background: var(--jrk-green); color: white; border: none; 
             padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; 
-            margin-top: 15px; cursor: pointer;
+            margin-top: 15px; cursor: pointer; transition: 0.2s;
         }
-
-        /* Visual Fix for Mobile Keyboard */
-        @media (max-height: 600px) {
-            .modal-content { margin-top: 10px; margin-bottom: 100px; }
-        }
+        #submit-btn:hover { background: var(--jrk-accent); }
     </style>
 </head>
 <body>
 
     <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
                   camera-controls camera-orbit="auto auto 150%" 
-                  environment-image="legacy" exposure="1.2" shadow-intensity="2">
+                  environment-image="legacy" exposure="1.1" shadow-intensity="1.5">
         
         <div class="ui-panel">
             <div class="button-group">
@@ -119,14 +130,12 @@
                 <span class="close-btn" id="close-modal">&times;</span>
                 
                 <div class="modal-left">
-                    <img src="prize.png" alt="JORAKAY Prize Model">
+                    <img src="prize.png" alt="JORAKAY Prize">
                 </div>
 
                 <div class="modal-right">
-                    <h2 style="color: #FF6B00; margin: 0 0 10px 0; font-size: 28px; font-weight: 900; line-height: 1.1;">
-                        WIN THIS PRIZE!
-                    </h2>
-                    <p style="font-size: 15px; color: #555; margin: 0 0 25px 0; line-height: 1.6;">
+                    <h2>WIN THIS PRIZE!</h2>
+                    <p>
                         Spot exactly how many modular pieces create the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.
                         <br><br>
                         Closest <b>3</b> answers win limited edition 3D-printed modular models of <b>JORAKAY</b>!
@@ -162,21 +171,13 @@
         viewer.addEventListener('load', () => {
             viewer.model.materials.forEach(m => {
                 m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
-                m.pbrMetallicRoughness.setRoughnessFactor(0.5);
+                m.pbrMetallicRoughness.setRoughnessFactor(0.4);
             });
         });
 
         // Modal Logic
-        document.getElementById('quiz-trigger').onclick = () => {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Lock background
-        };
-        
-        const closeLogic = () => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Unlock background
-        };
-
+        const closeLogic = () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; };
+        document.getElementById('quiz-trigger').onclick = () => { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; };
         document.getElementById('close-modal').onclick = closeLogic;
         window.onclick = (e) => { if (e.target == modal) closeLogic(); }
 
@@ -187,7 +188,7 @@
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
             try {
                 await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-                alert("Boom! Entry received.");
+                alert("Boom! Entry received. Good luck!");
                 closeLogic();
                 e.target.reset();
             } catch (err) { alert("Error."); }
