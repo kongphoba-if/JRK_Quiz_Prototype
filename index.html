@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JRK Pavilion | JORAKAY Challenge</title>
+    <title>JORAKAY EXPERT PAVILION | Challenge</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         body { margin: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overflow: hidden; }
@@ -13,7 +13,7 @@
         .ui-panel {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.92); padding: 20px; border-radius: 30px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.15); width: 340px; text-align: center; 
+            box-shadow: 0 15px 45px rgba(0,0,0,0.1); width: 340px; text-align: center; 
             z-index: 1000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.4);
         }
@@ -24,7 +24,6 @@
             font-size: 11px; font-weight: 800; cursor: pointer; color: #666; transition: 0.3s; flex: 1;
         }
         .mode-btn.active { background: #000; color: white; }
-        .mode-btn:disabled { opacity: 0.7; cursor: wait; }
 
         #quiz-trigger {
             width: 100%; background: #FF6B00; color: white; border: none; padding: 16px;
@@ -35,59 +34,56 @@
         /* Modal Overlay */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
 
-        /* Sleek Side-by-Side Modal Card */
+        /* High-End Modal Card */
         .modal-content { 
-            background: white; border-radius: 35px; width: 90%; max-width: 700px; 
-            display: flex; flex-direction: row; /* Desktop split view */
-            overflow: hidden; /* Clip rounded corners */
-            position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.5);
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white; border-radius: 40px; width: 92%; max-width: 850px; 
+            display: flex; flex-direction: row; overflow: hidden;
+            position: relative; box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Mobile Stacking for Modal */
-        @media (max-width: 600px) {
-            .modal-content { flex-direction: column; max-width: 400px; text-align: center; }
-            .modal-left { border-radius: 0 0 0 0 !important; }
-            .modal-right { text-align: center !important; }
+        @media (max-width: 750px) {
+            .modal-content { flex-direction: column; max-width: 450px; }
+            .modal-left { min-height: 250px; }
+            .modal-right { padding: 30px !important; text-align: center !important; }
         }
 
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .close-btn { position: absolute; top: 18px; right: 25px; font-size: 32px; cursor: pointer; color: white; text-shadow: 0 1px 5px rgba(0,0,0,0.5); z-index: 10; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #333; z-index: 10; opacity: 0.5; transition: 0.3s; }
+        .close-btn:hover { opacity: 1; }
 
-        /* Left Panel: Prize Image */
+        /* Left Panel: The Prize Presentation */
         .modal-left { 
-            flex: 1; 
-            background: #eee; /* Fallback */
-            display: flex; justify-content: center; align-items: center; padding: 30px;
-            box-sizing: border-box;
-            background-image: radial-gradient(circle at center, #ddd 0%, #aaa 100%); /* Slight gradient context for prize */
+            flex: 1.2; 
+            background: radial-gradient(circle at center, #ffffff 0%, #f4f4f4 100%);
+            display: flex; justify-content: center; align-items: center; padding: 40px;
+            box-sizing: border-box; position: relative;
         }
         
         .modal-left img {
-            max-width: 100%; max-height: 100%; height: auto;
-            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            object-fit: contain;
+            width: 100%; max-width: 350px; height: auto;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); /* Makes the PNG blend and pop */
+            transform: scale(1.1); /* Slightly bigger prize */
         }
 
-        /* Right Panel: Text & Form */
+        /* Right Panel: The Form */
         .modal-right { 
-            flex: 1.2; padding: 45px; box-sizing: border-box; text-align: left;
+            flex: 1; padding: 50px 40px; box-sizing: border-box; text-align: left;
             display: flex; flex-direction: column; justify-content: center;
+            border-left: 1px solid #f0f0f0;
         }
         
-        input { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #eee; border-radius: 15px; box-sizing: border-box; background: #fcfcfc; font-size: 16px; outline-color: #FF6B00; }
-        #submit-btn { width: 100%; background: #FF6B00; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 800; font-size: 16px; margin-top: 15px; cursor: pointer; transition: 0.2s; }
-        #submit-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-        #success-msg { display: none; color: #2ecc71; font-weight: 700; margin-top: 20px; font-size: 16px; }
+        input { width: 100%; padding: 16px; margin: 10px 0; border: 1px solid #eee; border-radius: 16px; box-sizing: border-box; background: #fcfcfc; font-size: 16px; outline-color: #FF6B00; }
+        #submit-btn { width: 100%; background: #FF6B00; color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <link rel="prefetch" href="detail.glb">
-    <link rel="prefetch" href="simple.glb">
-    <link rel="prefetch" href="prize.png"> <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
+    <link rel="prefetch" href="prize.png">
+
+    <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
                   camera-controls camera-orbit="auto auto 150%" 
                   environment-image="legacy" exposure="1.2" shadow-intensity="2">
         
@@ -96,7 +92,7 @@
                 <button id="btn-simple" class="mode-btn active">SIMPLIFIED</button>
                 <button id="btn-detail" class="mode-btn">DETAILED</button>
             </div>
-            <button id="quiz-trigger">🎁 THE JORAKAY CHALLENGE</button>
+            <button id="quiz-trigger">🎁 THE PAVILION CHALLENGE</button>
         </div>
 
         <div id="quiz-modal" class="modal">
@@ -104,17 +100,17 @@
                 <span class="close-btn" id="close-modal">&times;</span>
                 
                 <div class="modal-left">
-                    <img src="prize.png" alt="3D Printed JORAKAY Model Prize">
+                    <img src="prize.png" alt="JORAKAY Prize Model">
                 </div>
 
                 <div class="modal-right">
-                    <h2 style="color: #FF6B00; margin: 0 0 10px 0; font-size: 28px; font-weight: 900; line-height: 1.1;">
+                    <h2 style="color: #FF6B00; margin: 0 0 10px 0; font-size: 30px; font-weight: 900; line-height: 1.1;">
                         WIN THIS PRIZE!
                     </h2>
                     <p style="font-size: 15px; color: #555; margin: 0 0 25px 0; line-height: 1.6;">
-                        Spot exactly how many modular pieces create the **JRK Pavilion**! Submit your closest guess now.
+                        Spot exactly how many modular pieces create the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.
                         <br><br>
-                        Closest **3** answers win limited edition 3D-printed modular models of **'JORAKAY'**!
+                        Closest <b>3</b> answers win limited edition 3D-printed modular models of <b>JORAKAY</b>!
                     </p>
                     <form id="quiz-form">
                         <input type="number" name="guess" placeholder="Your Guess (e.g. 142)" required>
@@ -123,7 +119,6 @@
                         <input type="email" name="email" placeholder="Email Address" required>
                         <button type="submit" id="submit-btn">SUBMIT ENTRY</button>
                     </form>
-                    <div id="success-msg">🎉 Entry recorded! Good luck, closest 3 guesses win.</div>
                 </div>
             </div>
         </div>
@@ -135,17 +130,11 @@
         const btnDetail = document.getElementById('btn-detail');
         const modal = document.getElementById('quiz-modal');
 
-        // High-Performance Switcher (Prefetched)
         function switchModel(mode) {
             btnSimple.classList.toggle('active', mode === 'simple');
             btnDetail.classList.toggle('active', mode === 'detail');
-            
             const newSrc = mode === 'simple' ? 'simple.glb' : 'detail.glb';
-            
             if (viewer.src !== newSrc) {
-                btnSimple.disabled = true; btnDetail.disabled = true;
-                btnDetail.innerText = mode === 'detail' ? "LOADING..." : "DETAILED";
-                btnSimple.innerText = mode === 'simple' ? "LOADING..." : "SIMPLIFIED";
                 viewer.src = newSrc;
             }
         }
@@ -154,33 +143,28 @@
         btnDetail.onclick = () => switchModel('detail');
 
         viewer.addEventListener('load', () => {
-            btnSimple.disabled = false; btnDetail.disabled = false;
-            btnSimple.innerText = "SIMPLIFIED"; btnDetail.innerText = "DETAILED";
             viewer.model.materials.forEach(m => {
                 m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
                 m.pbrMetallicRoughness.setRoughnessFactor(0.5);
             });
         });
 
-        // Modal Controls
         document.getElementById('quiz-trigger').onclick = () => modal.style.display = 'flex';
         document.getElementById('close-modal').onclick = () => modal.style.display = 'none';
         window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; }
 
-        // Form Submit (Google Sheets)
         document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.innerText = "SENDING...";
-            btn.disabled = true;
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
             try {
                 await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-                document.getElementById('quiz-form').style.display = 'none';
-                document.getElementById('success-msg').style.display = 'block';
-                setTimeout(() => { modal.style.display = 'none'; e.target.reset(); document.getElementById('quiz-form').style.display = 'block'; document.getElementById('success-msg').style.display = 'none'; }, 4000);
-            } catch (err) { alert("Error submitting. Please try again."); }
-            btn.innerText = "SUBMIT ENTRY"; btn.disabled = false;
+                alert("Boom! Entry received. Good luck!");
+                modal.style.display = 'none';
+                e.target.reset();
+            } catch (err) { alert("Error."); }
+            btn.innerText = "SUBMIT ENTRY";
         };
     </script>
 </body>
