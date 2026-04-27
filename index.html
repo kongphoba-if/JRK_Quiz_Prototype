@@ -7,201 +7,177 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         :root {
-            --jrk-forest: #162b14;     /* Deep Forest Green */
-            --jrk-emerald: #2E7D32;    /* Primary Branding Green */
-            --jrk-accent: #4CAF50;     /* UI Highlight Green */
+            --jrk-forest: #162b14;
+            --jrk-emerald: #2E7D32;
+            --jrk-button: #2D6A30;
+            --jrk-mint: #4CAF50;
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: #fff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: #fff; overflow: hidden; }
         
-        model-viewer { 
-            width: 100%; height: 100%; display: block; 
-            background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); 
-        }
+        model-viewer { width: 100%; height: 100%; display: block; background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); }
 
-        /* Bottom Control Panel - Lifted for Gesture Nav */
+        /* Bottom Control Panel */
         .ui-panel {
-            position: absolute; 
-            bottom: calc(40px + env(safe-area-inset-bottom));
+            position: absolute; bottom: calc(40px + env(safe-area-inset-bottom));
             left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 30px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.1); width: 340px; max-width: 85vw; text-align: center; 
+            background: rgba(255, 255, 255, 0.95); padding: 18px; border-radius: 30px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.1); width: 360px; max-width: 90vw; text-align: center; 
             z-index: 1000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.4);
         }
 
-        .button-group { display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; }
+        .button-group { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; }
         .mode-btn {
-            background: #eee; border: none; padding: 12px; border-radius: 18px;
-            font-size: 11px; font-weight: 800; cursor: pointer; color: #666; flex: 1; transition: 0.3s;
+            background: #eee; border: none; padding: 12px 8px; border-radius: 15px;
+            font-size: 10px; font-weight: 800; cursor: pointer; color: #666; flex: 1; transition: 0.3s;
         }
         .mode-btn.active { background: var(--jrk-forest); color: white; }
 
         #quiz-trigger {
             width: 100%; background: var(--jrk-emerald); color: white; border: none; padding: 16px;
-            border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+            border-radius: 20px; font-weight: 800; font-size: 13px; cursor: pointer;
         }
 
-        /* Modal Overlay - Scrollable for Mobile */
+        /* Modal Base */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); z-index: 2000; 
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding: 40px 0;
+            background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; padding: 40px 0;
         }
 
-        /* Modal Content Card */
         .modal-content { 
             background: #ffffff; border-radius: 40px; width: 92%; max-width: 850px; 
             margin: auto; display: flex; flex-direction: row; overflow: hidden;
             position: relative; box-shadow: 0 40px 120px rgba(0,0,0,0.6);
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @media (max-width: 750px) {
-            .modal-content { flex-direction: column; max-width: 450px; }
-            .modal-left { padding: 40px 20px !important; }
-            .modal-right { padding: 50px 30px !important; }
-        }
+        @media (max-width: 750px) { .modal-content { flex-direction: column; } }
 
-        @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #aaa; z-index: 10; transition: 0.3s; }
-        .close-btn:hover { color: var(--jrk-accent); }
-
-        /* LEFT SIDE: Pure White with Transparent Image */
-        .modal-left { 
-            flex: 1.2; 
-            background: #ffffff; 
-            display: flex; justify-content: center; align-items: center; padding: 50px;
-            box-sizing: border-box; 
-        }
+        /* AFTER LIFE GALLERY MODAL */
+        #afterlife-viewer { width: 100%; height: 400px; background: #fff; }
+        .gallery-container { position: relative; flex: 1.2; background: #fff; display: flex; flex-direction: column; }
         
-        .modal-left img {
-            width: 100%; max-width: 420px; height: auto;
-            /* No more mix-blend-mode! A transparent PNG will just "float" */
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
-            transition: transform 0.3s ease;
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.05); border: none; width: 50px; height: 50px;
+            border-radius: 25px; cursor: pointer; font-size: 20px; transition: 0.3s; z-index: 10;
         }
+        .nav-arrow:hover { background: #eee; }
+        #prev-btn { left: 20px; }
+        #next-btn { right: 20px; }
 
-        /* RIGHT SIDE: Deep Green Theme */
-        .modal-right { 
-            flex: 1; padding: 60px 45px; box-sizing: border-box; text-align: left;
-            display: flex; flex-direction: column; justify-content: center;
-            background: var(--jrk-forest); 
-            color: #ffffff;
-        }
+        .counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 700; color: #ccc; }
 
-        .modal-right h2 { color: #ffffff; font-size: 30px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
-        .modal-right p { font-size: 14px; color: #a5ba9e; line-height: 1.6; margin-bottom: 25px; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #aaa; z-index: 100; }
+
+        /* Left/Right Modal Split (Shared Styles) */
+        .modal-left { flex: 1.2; background: #fff; display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .modal-right { flex: 1; padding: 50px 40px; background: var(--jrk-forest); color: #fff; }
         
-        input { 
-            width: 100%; padding: 16px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); 
-            font-size: 16px; color: white; outline: none;
-        }
-        input:focus { border-color: var(--jrk-accent); background: rgba(255,255,255,0.1); }
-        input::placeholder { color: #5a7058; }
-        
-        #submit-btn { 
-            width: 100%; background: var(--jrk-emerald); color: white; border: none; 
-            padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; 
-            margin-top: 15px; cursor: pointer; transition: 0.2s;
-        }
-        #submit-btn:hover { background: #388E3C; }
+        input { width: 100%; padding: 16px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; background: rgba(255,255,255,0.05); color: white; }
+        #submit-btn { width: 100%; background: var(--jrk-button); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
-                  camera-controls camera-orbit="auto auto 150%" 
-                  environment-image="legacy" exposure="1.1" shadow-intensity="1.5">
+    <model-viewer id="viewer" src="simple.glb" ar camera-controls camera-orbit="auto auto 150%" environment-image="legacy" exposure="1.1">
         
         <div class="ui-panel">
             <div class="button-group">
                 <button id="btn-simple" class="mode-btn active">SIMPLIFIED</button>
                 <button id="btn-detail" class="mode-btn">DETAILED</button>
+                <button id="btn-afterlife" class="mode-btn">AFTER LIFE</button>
             </div>
             <button id="quiz-trigger">🎁 THE PAVILION CHALLENGE</button>
         </div>
 
         <div id="quiz-modal" class="modal">
             <div class="modal-content">
-                <span class="close-btn" id="close-modal">&times;</span>
-                
-                <div class="modal-left">
-                    <img src="prize.png" alt="JORAKAY Prize">
-                </div>
-
+                <span class="close-btn" onclick="closeModals()">&times;</span>
+                <div class="modal-left"><img src="prize.png" style="width:100%; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));"></div>
                 <div class="modal-right">
-                    <h2>WIN THIS PRIZE!</h2>
-                    <p>
-                        Guess how many modular pieces were used in the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.
-                        <br><br>
-                        Closest <b>3</b> answers win limited edition 3D-printed modular models of <b>JORAKAY</b>!
-                    </p>
+                    <h2 style="color:white; margin:0;">WIN THIS PRIZE!</h2>
+                    <p style="color:#a5ba9e; font-size:14px;">Guess the modular pieces used in the <b>JORAKAY EXPERT PAVILION</b>!</p>
                     <form id="quiz-form">
-                        <input type="number" name="guess" placeholder="Your Guess (e.g. 142)" required>
+                        <input type="number" name="guess" placeholder="Your Guess" required>
                         <input type="text" name="name" placeholder="Full Name" required>
                         <input type="tel" name="phone" placeholder="Phone Number" required>
-                        <input type="email" name="email" placeholder="Email Address" required>
+                        <input type="email" name="email" placeholder="Email" required>
                         <button type="submit" id="submit-btn">SUBMIT ENTRY</button>
                     </form>
                 </div>
             </div>
         </div>
+
+        <div id="afterlife-modal" class="modal">
+            <div class="modal-content" style="max-width: 700px; flex-direction: column;">
+                <span class="close-btn" onclick="closeModals()">&times;</span>
+                <div class="gallery-container">
+                    <button class="nav-arrow" id="prev-btn">◀</button>
+                    <model-viewer id="afterlife-viewer" src="life_1.glb" camera-controls auto-rotate shadow-intensity="1" exposure="1"></model-viewer>
+                    <button class="nav-arrow" id="next-btn">▶</button>
+                    <div class="counter" id="life-counter">1 / 10</div>
+                </div>
+                <div style="padding: 30px; text-align: center; background: #f9f9f9;">
+                    <h3 style="margin:0; color: var(--jrk-forest);">RECONFIGURED SERIES</h3>
+                    <p style="margin:5px 0 0 0; font-size: 13px; color: #888;">Discover how the pavilion modules transform into furniture.</p>
+                </div>
+            </div>
+        </div>
+
     </model-viewer>
 
     <script>
         const viewer = document.getElementById('viewer');
-        const btnSimple = document.getElementById('btn-simple');
-        const btnDetail = document.getElementById('btn-detail');
-        const modal = document.getElementById('quiz-modal');
+        const afterlifeViewer = document.getElementById('afterlife-viewer');
+        const afterlifeModal = document.getElementById('afterlife-modal');
+        const quizModal = document.getElementById('quiz-modal');
+        
+        // After Life Gallery Logic
+        let currentLife = 1;
+        const totalLife = 17; // Change this to your total number of files
 
-        function switchModel(mode) {
-            btnSimple.classList.toggle('active', mode === 'simple');
-            btnDetail.classList.toggle('active', mode === 'detail');
-            const newSrc = mode === 'simple' ? 'simple.glb' : 'detail.glb';
-            if (viewer.src !== newSrc) { viewer.src = newSrc; }
+        function updateLife(dir) {
+            currentLife += dir;
+            if (currentLife > totalLife) currentLife = 1;
+            if (currentLife < 1) currentLife = totalLife;
+            
+            afterlifeViewer.src = `life_${currentLife}.glb`;
+            document.getElementById('life-counter').innerText = `${currentLife} / ${totalLife}`;
         }
 
-        btnSimple.onclick = () => switchModel('simple');
-        btnDetail.onclick = () => switchModel('detail');
+        document.getElementById('next-btn').onclick = () => updateLife(1);
+        document.getElementById('prev-btn').onclick = () => updateLife(-1);
 
+        // UI Controls
+        document.getElementById('btn-simple').onclick = () => {
+            viewer.src = 'simple.glb';
+            document.getElementById('btn-simple').classList.add('active');
+            document.getElementById('btn-detail').classList.remove('active');
+        };
+        document.getElementById('btn-detail').onclick = () => {
+            viewer.src = 'detail.glb';
+            document.getElementById('btn-detail').classList.add('active');
+            document.getElementById('btn-simple').classList.remove('active');
+        };
+        document.getElementById('btn-afterlife').onclick = () => {
+            afterlifeModal.style.display = 'flex';
+        };
+        document.getElementById('quiz-trigger').onclick = () => {
+            quizModal.style.display = 'flex';
+        };
+
+        function closeModals() {
+            afterlifeModal.style.display = 'none';
+            quizModal.style.display = 'none';
+        }
+
+        window.onclick = (e) => { if (e.target.className === 'modal') closeModals(); }
+
+        // Vertex Color Fix
         viewer.addEventListener('load', () => {
-            viewer.model.materials.forEach(m => {
-                m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
-                m.pbrMetallicRoughness.setRoughnessFactor(0.4);
-            });
+            viewer.model.materials.forEach(m => m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]));
         });
-
-        // Modal Controls
-        const closeLogic = () => { 
-            modal.style.display = 'none'; 
-            document.body.style.overflow = 'auto'; 
-        };
-        document.getElementById('quiz-trigger').onclick = () => { 
-            modal.style.display = 'flex'; 
-            document.body.style.overflow = 'hidden'; 
-        };
-        document.getElementById('close-modal').onclick = closeLogic;
-        window.onclick = (e) => { if (e.target == modal) closeLogic(); }
-
-        // Form Submit
-        document.getElementById('quiz-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "SENDING...";
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
-            try {
-                await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-                alert("Entry received! Good luck.");
-                closeLogic();
-                e.target.reset();
-            } catch (err) { alert("Error."); }
-            btn.innerText = "SUBMIT ENTRY";
-        };
     </script>
 </body>
 </html>
