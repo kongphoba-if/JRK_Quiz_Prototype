@@ -7,10 +7,9 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         :root {
-            --jrk-forest: #1A3317;     /* The dark green for the form */
-            --jrk-emerald: #2E7D32;    /* The branding green */
-            --jrk-button: #2D6A30;     /* The submit button green */
-            --jrk-mint: #4CAF50;       /* Highlight green */
+            --jrk-forest: #162b14;     /* Deep Forest Green */
+            --jrk-emerald: #2E7D32;    /* Primary Branding Green */
+            --jrk-accent: #4CAF50;     /* UI Highlight Green */
         }
 
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: #fff; }
@@ -20,7 +19,7 @@
             background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); 
         }
 
-        /* Bottom UI Panel */
+        /* Bottom Control Panel */
         .ui-panel {
             position: absolute; 
             bottom: calc(40px + env(safe-area-inset-bottom));
@@ -44,7 +43,7 @@
             box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
         }
 
-        /* Modal Settings */
+        /* Modal Overlay */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 2000; 
@@ -52,7 +51,7 @@
             padding: 40px 0;
         }
 
-        /* Perfect Split Card */
+        /* Modal Content Card */
         .modal-content { 
             background: #ffffff; border-radius: 40px; width: 92%; max-width: 850px; 
             margin: auto; display: flex; flex-direction: row; overflow: hidden;
@@ -62,29 +61,31 @@
 
         @media (max-width: 750px) {
             .modal-content { flex-direction: column; max-width: 450px; }
-            .modal-left { padding: 40px 20px !important; }
-            .modal-right { padding: 40px 25px !important; }
+            .modal-left { padding: 30px !important; }
+            .modal-right { padding: 40px 30px !important; }
         }
 
         @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #999; z-index: 10; transition: 0.3s; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #aaa; z-index: 10; transition: 0.3s; }
+        .close-btn:hover { color: #fff; }
 
-        /* LEFT SIDE: Pure White to Blend with PNG */
+        /* LEFT SIDE: Pure White Gallery Side */
         .modal-left { 
-            flex: 1.2; background: #ffffff;
+            flex: 1.2; 
+            background: #ffffff !important; /* FORCED PURE WHITE */
             display: flex; justify-content: center; align-items: center; padding: 50px;
             box-sizing: border-box; 
         }
         
         .modal-left img {
-            width: 100%; max-width: 380px; height: auto;
-            /* Filter helps blend the white of the image with the white of the box */
+            width: 100%; max-width: 400px; height: auto;
+            /* Multiply removes the white box of the image, blending it with the div */
             mix-blend-mode: multiply; 
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.08));
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
         }
 
-        /* RIGHT SIDE: Dark Forest Forest Theme */
+        /* RIGHT SIDE: Deep Green Info Side */
         .modal-right { 
             flex: 1; padding: 60px 45px; box-sizing: border-box; text-align: left;
             display: flex; flex-direction: column; justify-content: center;
@@ -92,22 +93,23 @@
             color: #ffffff;
         }
 
-        .modal-right h2 { color: #ffffff; font-size: 28px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
-        .modal-right p { font-size: 14px; color: #b0cbb0; line-height: 1.6; margin-bottom: 25px; }
+        .modal-right h2 { color: #ffffff; font-size: 30px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
+        .modal-right p { font-size: 14px; color: #a5ba9e; line-height: 1.6; margin-bottom: 25px; }
         
         input { 
             width: 100%; padding: 16px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); 
             font-size: 16px; color: white; outline: none;
         }
-        input:focus { border-color: var(--jrk-mint); background: rgba(255,255,255,0.1); }
+        input:focus { border-color: var(--jrk-accent); background: rgba(255,255,255,0.1); }
+        input::placeholder { color: #5a7058; }
         
         #submit-btn { 
-            width: 100%; background: var(--jrk-button); color: white; border: none; 
+            width: 100%; background: var(--jrk-emerald); color: white; border: none; 
             padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; 
             margin-top: 15px; cursor: pointer; transition: 0.2s;
         }
-        #submit-btn:hover { background: var(--jrk-emerald); }
+        #submit-btn:hover { background: #388E3C; }
     </style>
 </head>
 <body>
@@ -174,7 +176,7 @@
             });
         });
 
-        // Modal Controls
+        // Modal Logic
         const closeLogic = () => { 
             modal.style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
@@ -186,7 +188,6 @@
         document.getElementById('close-modal').onclick = closeLogic;
         window.onclick = (e) => { if (e.target == modal) closeLogic(); }
 
-        // Form Submit
         document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -194,7 +195,7 @@
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
             try {
                 await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-                alert("Boom! Entry received. Good luck!");
+                alert("Entry received! Good luck.");
                 closeLogic();
                 e.target.reset();
             } catch (err) { alert("Error."); }
