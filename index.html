@@ -3,54 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JRK Sculpture | Quiz Challenge</title>
+    <title>JRK Pavilion | Quiz Challenge</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        body { margin: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; overflow: hidden; }
-        
-        model-viewer { 
-            width: 100vw; height: 100vh; display: block; 
-            background: radial-gradient(circle, #ffffff 0%, #f0f0f0 100%);
+        body { margin: 0; background: #ffffff; font-family: -apple-system, system-ui, sans-serif; overflow: hidden; }
+        model-viewer { width: 100vw; height: 100vh; display: block; background: radial-gradient(circle, #ffffff 0%, #f0f0f0 100%); }
+
+        /* Floating UI Panel */
+        .ui-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); width: 320px; text-align: center; 
+            z-index: 1000; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Entry Button */
+        .button-group { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        .mode-btn {
+            background: #eee; border: none; padding: 10px 15px; border-radius: 15px;
+            font-size: 11px; font-weight: 800; cursor: pointer; color: #666; transition: 0.3s; flex: 1;
+        }
+        .mode-btn.active { background: #000; color: white; }
+
         #quiz-trigger {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: #FF6B00; color: white; border: none; padding: 18px 36px;
-            border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4); z-index: 1000; 
-            transition: transform 0.2s ease;
-        }
-        #quiz-trigger:active { transform: translateX(-50%) scale(0.95); }
-
-        /* Modal Overlay */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center;
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            width: 100%; background: #FF6B00; color: white; border: none; padding: 15px;
+            border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
         }
 
-        /* Quiz Card */
-        .modal-content {
-            background: white; padding: 35px; border-radius: 30px; width: 88%; max-width: 420px;
-            text-align: center; position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.4);
-        }
-
+        /* Modal styling */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 400px; text-align: center; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #ccc; }
-
-        input {
-            width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #eee;
-            border-radius: 14px; box-sizing: border-box; font-size: 16px; 
-            background: #fcfcfc; outline-color: #FF6B00;
-        }
-
-        #submit-btn {
-            width: 100%; background: #FF6B00; color: white; border: none;
-            padding: 18px; border-radius: 14px; font-weight: 800; font-size: 16px;
-            margin-top: 15px; cursor: pointer;
-        }
-
-        #success-msg { display: none; color: #2ecc71; font-weight: 700; margin-top: 20px; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; background: #f9f9f9; outline-color: #FF6B00; }
+        #submit-btn { width: 100%; background: #FF6B00; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -59,84 +44,104 @@
                   camera-controls camera-orbit="auto auto 150%" max-camera-orbit="auto auto 400%"
                   environment-image="legacy" exposure="1.2" shadow-intensity="2" shadow-softness="0.5">
         
-        <button id="quiz-trigger">🎁 WIN A REWARD</button>
+        <div class="ui-panel">
+            <div class="button-group">
+                <button id="btn-simple" class="mode-btn active">SIMPLIFIED</button>
+                <button id="btn-detail" class="mode-btn">DETAILED</button>
+            </div>
+            <button id="quiz-trigger">🎁 THE PAVILION CHALLENGE</button>
+        </div>
 
         <div id="quiz-modal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" id="close-modal">&times;</span>
-                <h2 style="color: #FF6B00; margin: 0 0 8px 0;">How Many Parts?</h2>
-                <p style="font-size: 15px; color: #777; margin-bottom: 25px;">
-                    Guess the total number of individual parts in this sculpture for a chance to win!
+                <h2 style="color: #FF6B00; margin: 0;">How Many Parts?</h2>
+                <p style="font-size: 14px; color: #777; margin-bottom: 20px;">
+                    Guess the total amount of parts in the <b>JRK Pavilion</b> for a reward!
                 </p>
-                
                 <form id="quiz-form">
-                    <input type="number" name="guess" placeholder="Your Guess (e.g. 25)" required>
+                    <input type="number" name="guess" placeholder="Your Guess" required>
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="tel" name="phone" placeholder="Phone Number" required>
                     <input type="email" name="email" placeholder="Email Address" required>
                     <button type="submit" id="submit-btn">SUBMIT ENTRY</button>
                 </form>
-
-                <div id="success-msg">
-                    🎉 Entry Received!<br>
-                    <span style="font-weight: 400; font-size: 14px; color: #666;">We will contact you if you win.</span>
-                </div>
+                <div id="success-msg" style="display:none; color: #2ecc71; font-weight: 700; margin-top: 20px;">🎉 Success! Entry recorded.</div>
             </div>
         </div>
     </model-viewer>
 
     <script>
         const viewer = document.getElementById('viewer');
+        const btnSimple = document.getElementById('btn-simple');
+        const btnDetail = document.getElementById('btn-detail');
         const modal = document.getElementById('quiz-modal');
-        const trigger = document.getElementById('quiz-trigger');
-        const closeBtn = document.getElementById('close-modal');
-        const form = document.getElementById('quiz-form');
+        const quizTrigger = document.getElementById('quiz-trigger');
+        const closeModal = document.getElementById('close-modal');
 
-        // Modal Controls
-        trigger.onclick = () => modal.style.display = 'flex';
-        closeBtn.onclick = () => modal.style.display = 'none';
+        let simpleNodes = [];
+        let detailNodes = [];
+
+        function initNodes() {
+            if (!viewer.model) return;
+            const symbols = Object.getOwnPropertySymbols(viewer.model);
+            const hSym = symbols.find(s => s.toString().includes('hierarchy'));
+            const allNodes = viewer.model[hSym] || viewer.model.nodes || [];
+
+            // Filters for prefixes: matches Simple_Pavilion or Detail_Pavilion
+            simpleNodes = allNodes.filter(n => (n.name || "").toLowerCase().startsWith("simple"));
+            detailNodes = allNodes.filter(n => (n.name || "").toLowerCase().startsWith("detail"));
+
+            switchDetail('simple');
+        }
+
+        function toggleDeep(node, isVisible) {
+            node.visible = isVisible;
+            if (node.mesh) node.mesh.visible = isVisible;
+            if (node.children) node.children.forEach(c => toggleDeep(c, isVisible));
+            if (node.scale) node.scale.set(isVisible ? 1 : 0, isVisible ? 1 : 0, isVisible ? 1 : 0);
+        }
+
+        function switchDetail(mode) {
+            simpleNodes.forEach(n => toggleDeep(n, mode === 'simple'));
+            detailNodes.forEach(n => toggleDeep(n, mode === 'detail'));
+            
+            btnSimple.classList.toggle('active', mode === 'simple');
+            btnDetail.classList.toggle('active', mode === 'detail');
+
+            if (typeof viewer.queueRender === 'function') viewer.queueRender();
+        }
+
+        btnSimple.onclick = () => switchDetail('simple');
+        btnDetail.onclick = () => switchDetail('detail');
+
+        // Quiz Handling
+        quizTrigger.onclick = () => modal.style.display = 'flex';
+        closeModal.onclick = () => modal.style.display = 'none';
         window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; }
 
-        // Quiz Submission
-        form.onsubmit = async (e) => {
+        document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.innerText = "SENDING...";
-            btn.disabled = true;
-
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
-            const data = new FormData(form);
-
             try {
-                await fetch(scriptURL, { method: 'POST', body: data, mode: 'no-cors' });
-                form.style.display = 'none';
+                await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
+                document.getElementById('quiz-form').style.display = 'none';
                 document.getElementById('success-msg').style.display = 'block';
-                setTimeout(() => { 
-                    modal.style.display = 'none'; 
-                    form.style.display = 'block';
-                    document.getElementById('success-msg').style.display = 'none';
-                    form.reset();
-                    btn.innerText = "SUBMIT ENTRY";
-                    btn.disabled = false;
-                }, 3500);
-            } catch (error) {
-                alert("Error submitting. Please try again.");
-                btn.innerText = "SUBMIT ENTRY";
-                btn.disabled = false;
-            }
+                setTimeout(() => { modal.style.display = 'none'; }, 3000);
+            } catch (err) { alert("Error submitting. Try again."); btn.innerText = "SUBMIT ENTRY"; }
         };
 
-        // THE FIX: Forcing Vertex Colors to be visible
+        // Visual Polish & Node Initialization
         viewer.addEventListener('load', () => {
-            const materials = viewer.model.materials;
-            materials.forEach(mat => {
-                // Force Material to White so Vertex Colors multiply correctly (1 * Color = Color)
-                mat.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
-                
-                // Polish settings
-                mat.pbrMetallicRoughness.setRoughnessFactor(0.5);
-                mat.pbrMetallicRoughness.setMetallicFactor(0.1);
-            });
+            setTimeout(() => {
+                viewer.model.materials.forEach(m => {
+                    m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]); // Keep Vertex Colors bright
+                    m.pbrMetallicRoughness.setRoughnessFactor(0.5);
+                });
+                initNodes();
+            }, 500);
         });
     </script>
 </body>
