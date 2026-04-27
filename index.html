@@ -19,7 +19,7 @@
             background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); 
         }
 
-        /* Bottom Control Panel */
+        /* Bottom Control Panel - Lifted for Gesture Nav */
         .ui-panel {
             position: absolute; 
             bottom: calc(40px + env(safe-area-inset-bottom));
@@ -43,7 +43,7 @@
             box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
         }
 
-        /* Modal Overlay */
+        /* Modal Overlay - Scrollable for Mobile */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 2000; 
@@ -61,31 +61,31 @@
 
         @media (max-width: 750px) {
             .modal-content { flex-direction: column; max-width: 450px; }
-            .modal-left { padding: 30px !important; }
-            .modal-right { padding: 40px 30px !important; }
+            .modal-left { padding: 40px 20px !important; }
+            .modal-right { padding: 50px 30px !important; }
         }
 
-        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #aaa; z-index: 10; transition: 0.3s; }
-        .close-btn:hover { color: #fff; }
+        .close-btn:hover { color: var(--jrk-accent); }
 
-        /* LEFT SIDE: Pure White Gallery Side */
+        /* LEFT SIDE: Pure White with Transparent Image */
         .modal-left { 
             flex: 1.2; 
-            background: #ffffff !important; /* FORCED PURE WHITE */
+            background: #ffffff; 
             display: flex; justify-content: center; align-items: center; padding: 50px;
             box-sizing: border-box; 
         }
         
         .modal-left img {
-            width: 100%; max-width: 400px; height: auto;
-            /* Multiply removes the white box of the image, blending it with the div */
-            mix-blend-mode: multiply; 
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
+            width: 100%; max-width: 420px; height: auto;
+            /* No more mix-blend-mode! A transparent PNG will just "float" */
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
+            transition: transform 0.3s ease;
         }
 
-        /* RIGHT SIDE: Deep Green Info Side */
+        /* RIGHT SIDE: Deep Green Theme */
         .modal-right { 
             flex: 1; padding: 60px 45px; box-sizing: border-box; text-align: left;
             display: flex; flex-direction: column; justify-content: center;
@@ -176,7 +176,7 @@
             });
         });
 
-        // Modal Logic
+        // Modal Controls
         const closeLogic = () => { 
             modal.style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
@@ -188,6 +188,7 @@
         document.getElementById('close-modal').onclick = closeLogic;
         window.onclick = (e) => { if (e.target == modal) closeLogic(); }
 
+        // Form Submit
         document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
