@@ -7,20 +7,20 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         :root {
-            --jrk-green: #2E7D32;      /* Primary Emerald */
-            --jrk-dark: #1A3317;       /* Deep Forest */
-            --jrk-light: #F1F8F1;      /* Mint Tint */
-            --jrk-accent: #4CAF50;     /* Vibrant Leaf */
+            --jrk-forest: #1A3317;     /* The dark green for the form */
+            --jrk-emerald: #2E7D32;    /* The branding green */
+            --jrk-button: #2D6A30;     /* The submit button green */
+            --jrk-mint: #4CAF50;       /* Highlight green */
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #fff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: #fff; }
         
         model-viewer { 
             width: 100%; height: 100%; display: block; 
-            background: radial-gradient(circle, #ffffff 0%, #e8eee8 100%); 
+            background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); 
         }
 
-        /* UI Panel - Lifted for Mobile Gesture Nav */
+        /* Bottom UI Panel */
         .ui-panel {
             position: absolute; 
             bottom: calc(40px + env(safe-area-inset-bottom));
@@ -36,16 +36,15 @@
             background: #eee; border: none; padding: 12px; border-radius: 18px;
             font-size: 11px; font-weight: 800; cursor: pointer; color: #666; flex: 1; transition: 0.3s;
         }
-        .mode-btn.active { background: var(--jrk-dark); color: white; }
+        .mode-btn.active { background: var(--jrk-forest); color: white; }
 
         #quiz-trigger {
-            width: 100%; background: var(--jrk-green); color: white; border: none; padding: 16px;
+            width: 100%; background: var(--jrk-emerald); color: white; border: none; padding: 16px;
             border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3); transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
         }
-        #quiz-trigger:hover { background: var(--jrk-dark); }
 
-        /* Modal Overlay - Scrollable for Mobile */
+        /* Modal Settings */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 2000; 
@@ -53,9 +52,9 @@
             padding: 40px 0;
         }
 
-        /* Modal Content Card */
+        /* Perfect Split Card */
         .modal-content { 
-            background: white; border-radius: 40px; width: 92%; max-width: 850px; 
+            background: #ffffff; border-radius: 40px; width: 92%; max-width: 850px; 
             margin: auto; display: flex; flex-direction: row; overflow: hidden;
             position: relative; box-shadow: 0 40px 120px rgba(0,0,0,0.6);
             animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -63,16 +62,15 @@
 
         @media (max-width: 750px) {
             .modal-content { flex-direction: column; max-width: 450px; }
-            .modal-right { padding: 40px 25px !important; }
             .modal-left { padding: 40px 20px !important; }
+            .modal-right { padding: 40px 25px !important; }
         }
 
         @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #999; z-index: 10; transition: 0.3s; }
-        .close-btn:hover { color: var(--jrk-green); }
 
-        /* LEFT SIDE: Pure White Prize Side */
+        /* LEFT SIDE: Pure White to Blend with PNG */
         .modal-left { 
             flex: 1.2; background: #ffffff;
             display: flex; justify-content: center; align-items: center; padding: 50px;
@@ -81,18 +79,20 @@
         
         .modal-left img {
             width: 100%; max-width: 380px; height: auto;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
+            /* Filter helps blend the white of the image with the white of the box */
+            mix-blend-mode: multiply; 
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.08));
         }
 
-        /* RIGHT SIDE: Darker Form Side */
+        /* RIGHT SIDE: Dark Forest Forest Theme */
         .modal-right { 
             flex: 1; padding: 60px 45px; box-sizing: border-box; text-align: left;
             display: flex; flex-direction: column; justify-content: center;
-            background: var(--jrk-dark); /* DARK THEME FOR FORM */
+            background: var(--jrk-forest); 
             color: #ffffff;
         }
 
-        .modal-right h2 { color: var(--jrk-accent); font-size: 28px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
+        .modal-right h2 { color: #ffffff; font-size: 28px; font-weight: 900; margin: 0 0 10px 0; line-height: 1.1; }
         .modal-right p { font-size: 14px; color: #b0cbb0; line-height: 1.6; margin-bottom: 25px; }
         
         input { 
@@ -100,15 +100,14 @@
             border-radius: 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); 
             font-size: 16px; color: white; outline: none;
         }
-        input::placeholder { color: #668366; }
-        input:focus { border-color: var(--jrk-accent); background: rgba(255,255,255,0.1); }
+        input:focus { border-color: var(--jrk-mint); background: rgba(255,255,255,0.1); }
         
         #submit-btn { 
-            width: 100%; background: var(--jrk-green); color: white; border: none; 
+            width: 100%; background: var(--jrk-button); color: white; border: none; 
             padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; 
             margin-top: 15px; cursor: pointer; transition: 0.2s;
         }
-        #submit-btn:hover { background: var(--jrk-accent); }
+        #submit-btn:hover { background: var(--jrk-emerald); }
     </style>
 </head>
 <body>
@@ -136,7 +135,7 @@
                 <div class="modal-right">
                     <h2>WIN THIS PRIZE!</h2>
                     <p>
-                        Spot exactly how many modular pieces create the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.
+                        Guess how many modular pieces were used in the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.
                         <br><br>
                         Closest <b>3</b> answers win limited edition 3D-printed modular models of <b>JORAKAY</b>!
                     </p>
@@ -175,12 +174,19 @@
             });
         });
 
-        // Modal Logic
-        const closeLogic = () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; };
-        document.getElementById('quiz-trigger').onclick = () => { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; };
+        // Modal Controls
+        const closeLogic = () => { 
+            modal.style.display = 'none'; 
+            document.body.style.overflow = 'auto'; 
+        };
+        document.getElementById('quiz-trigger').onclick = () => { 
+            modal.style.display = 'flex'; 
+            document.body.style.overflow = 'hidden'; 
+        };
         document.getElementById('close-modal').onclick = closeLogic;
         window.onclick = (e) => { if (e.target == modal) closeLogic(); }
 
+        // Form Submit
         document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
