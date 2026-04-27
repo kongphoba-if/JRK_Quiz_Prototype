@@ -9,8 +9,8 @@
         :root {
             --jrk-forest: #162b14;     /* Deep Forest Green */
             --jrk-emerald: #2E7D32;    /* Primary Branding Green */
-            --jrk-button: #2D6A30;     /* Submit Button Green */
-            --jrk-mint: #4CAF50;       /* Follow Button Green */
+            --jrk-button: #2D6A30;     /* UI Highlight Green */
+            --jrk-mint: #4CAF50;       /* Accent/Instagram Green */
         }
 
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #fff; overflow: hidden; }
@@ -21,7 +21,7 @@
             background: radial-gradient(circle, #ffffff 0%, #f2f2f2 100%); 
         }
 
-        /* Bottom Control Panel */
+        /* Floating UI Panel (Mobile Optimized) */
         .ui-panel {
             position: absolute; bottom: calc(40px + env(safe-area-inset-bottom));
             left: 50%; transform: translateX(-50%);
@@ -44,7 +44,7 @@
             box-shadow: 0 8px 20px rgba(46, 125, 50, 0.2);
         }
 
-        /* Modal Base - Scrollable for Mobile */
+        /* Modal Overlay - Scrollable for Tall Mobile Screens */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; 
@@ -62,31 +62,30 @@
 
         @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* PULSE ANIMATION FOR PRIZE */
+        /* PULSE ANIMATION FOR PRIZE IMAGE */
         @keyframes pulsePrize { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
         .close-btn { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #aaa; z-index: 100; transition: 0.3s; }
         .close-btn:hover { color: var(--jrk-mint); }
 
-        /* LEFT SIDE: Pure White Gallery Side */
+        /* --- CHALLENGE MODAL (QUIZ) --- */
         .modal-left { 
             flex: 1.2; background: #ffffff !important;
             display: flex; justify-content: center; align-items: center; padding: 50px;
             box-sizing: border-box; 
         }
         .modal-left img { 
-            width: 100%; max-width: 400px; 
+            width: 100%; max-width: 400px; height: auto;
             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12)); 
             animation: pulsePrize 3s infinite ease-in-out;
+            will-change: transform;
         }
 
-        /* RIGHT SIDE: Deep Green Info/Form Side */
         .modal-right { 
             flex: 1; padding: 60px 45px; background: var(--jrk-forest); color: #ffffff;
             display: flex; flex-direction: column; justify-content: center; position: relative;
         }
 
-        /* Success Message Styling */
         #success-state { display: none; text-align: center; animation: fadeIn 0.5s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -95,7 +94,7 @@
         
         input { 
             width: 100%; padding: 16px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 16px; background: rgba(255,255,255,0.05); color: white; font-size: 16px; outline: none; 
+            border-radius: 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); color: white; font-size: 16px; outline: none; 
         }
         input::placeholder { color: #5a7058; }
 
@@ -106,10 +105,159 @@
         }
         .ig-button { background: var(--jrk-mint); box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3); }
 
-        /* --- AFTER LIFE GALLERY STYLES --- */
+        /* --- AFTER LIFE GALLERY --- */
         #afterlife-viewer { width: 100%; height: 450px; background: #fff; }
         .gallery-container { position: relative; flex: 1.2; background: #fff; display: flex; flex-direction: column; }
-        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.05); border: none; width: 50px; height: 50px; border-radius: 25px; cursor: pointer; font-size: 20px; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.05); border: none; width: 50px; height: 50px;
+            border-radius: 25px; cursor: pointer; font-size: 20px; transition: 0.3s; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-arrow:hover { background: #eee; }
         #prev-btn { left: 20px; }
         #next-btn { right: 20px; }
-        .counter { position: absolute; bottom:
+
+        .counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 800; color: #bbb; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
+                  camera-controls camera-orbit="auto auto 150%" environment-image="legacy" exposure="1.1">
+        
+        <div class="ui-panel">
+            <div class="button-group">
+                <button id="btn-simple" class="mode-btn active">SIMPLIFIED</button>
+                <button id="btn-detail" class="mode-btn">DETAILED</button>
+                <button id="btn-afterlife" class="mode-btn">AFTER LIFE</button>
+            </div>
+            <button id="quiz-trigger">🎁 THE PAVILION CHALLENGE</button>
+        </div>
+
+        <div id="quiz-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModals()">&times;</span>
+                <div class="modal-left"><img src="prize.png" alt="Prize"></div>
+                
+                <div class="modal-right">
+                    <div id="form-state">
+                        <h2>WIN THIS PRIZE!</h2>
+                        <p>Guess how many modular pieces were used in the <b>JORAKAY EXPERT PAVILION</b>! Submit your closest guess now.</p>
+                        <form id="quiz-form">
+                            <input type="number" name="guess" placeholder="Your Guess" required>
+                            <input type="text" name="name" placeholder="Full Name" required>
+                            <input type="tel" name="phone" placeholder="Phone Number" required>
+                            <input type="email" name="email" placeholder="Email Address" required>
+                            <button type="submit" id="submit-btn">SUBMIT ENTRY</button>
+                        </form>
+                    </div>
+
+                    <div id="success-state">
+                        <h2 style="font-size: 40px;">DONE! 🎉</h2>
+                        <p style="color: #fff; font-size: 15px; margin-top: 10px;">
+                            Winners will be announced after the end of <b>ASA ARCHITECT EXPO 2026</b> on the Supernatures Instagram account.
+                        </p>
+                        <p style="font-size: 13px; color: #a5ba9e;">Follow Supernatures here:</p>
+                        <a href="https://www.instagram.com/super.natures?igsh=ZmZzaDhla3RrNmZm" target="_blank" class="ig-button">FOLLOW SUPERNATURES</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="afterlife-modal" class="modal">
+            <div class="modal-content" style="max-width: 750px; flex-direction: column;">
+                <span class="close-btn" onclick="closeModals()">&times;</span>
+                <div class="gallery-container">
+                    <button class="nav-arrow" id="prev-btn">◀</button>
+                    <model-viewer id="afterlife-viewer" src="life_1.glb" camera-controls auto-rotate shadow-intensity="1"></model-viewer>
+                    <button class="nav-arrow" id="next-btn">▶</button>
+                    <div class="counter" id="life-counter">1 / 17</div>
+                </div>
+                <div style="padding: 35px; text-align: center; background: #fff; border-top: 1px solid #eee;">
+                    <h3 style="margin:0; color: var(--jrk-forest); font-weight: 900; letter-spacing: 1px;">RECONFIGURED SERIES</h3>
+                    <p style="margin:8px 0 0 0; font-size: 13px; color: #888;">Discover how the pavilion modules transform into furniture.</p>
+                </div>
+            </div>
+        </div>
+    </model-viewer>
+
+    <script>
+        const viewer = document.getElementById('viewer');
+        const afterlifeViewer = document.getElementById('afterlife-viewer');
+        const afterlifeModal = document.getElementById('afterlife-modal');
+        const quizModal = document.getElementById('quiz-modal');
+        
+        let currentLife = 1;
+        const totalLife = 17; 
+
+        function updateLife(dir) {
+            currentLife += dir;
+            if (currentLife > totalLife) currentLife = 1;
+            if (currentLife < 1) currentLife = totalLife;
+            afterlifeViewer.src = `life_${currentLife}.glb`;
+            document.getElementById('life-counter').innerText = `${currentLife} / ${totalLife}`;
+        }
+
+        document.getElementById('next-btn').onclick = () => updateLife(1);
+        document.getElementById('prev-btn').onclick = () => updateLife(-1);
+
+        // Fix vertex colors for Gallery models
+        afterlifeViewer.addEventListener('load', () => {
+            afterlifeViewer.model.materials.forEach(m => m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]));
+        });
+
+        // Toggle Pavilion View
+        document.getElementById('btn-simple').onclick = () => {
+            viewer.src = 'simple.glb';
+            document.getElementById('btn-simple').classList.add('active');
+            document.getElementById('btn-detail').classList.remove('active');
+        };
+        document.getElementById('btn-detail').onclick = () => {
+            viewer.src = 'detail.glb';
+            document.getElementById('btn-detail').classList.add('active');
+            document.getElementById('btn-simple').classList.remove('active');
+        };
+
+        // Modal Controls
+        document.getElementById('btn-afterlife').onclick = () => {
+            afterlifeModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+        document.getElementById('quiz-trigger').onclick = () => { 
+            quizModal.style.display = 'flex'; 
+            document.body.style.overflow = 'hidden';
+            document.getElementById('form-state').style.display = 'block';
+            document.getElementById('success-state').style.display = 'none';
+        };
+
+        function closeModals() {
+            afterlifeModal.style.display = 'none';
+            quizModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = (e) => { if (e.target.className === 'modal') closeModals(); }
+
+        // Fix vertex colors for Main Pavilion
+        viewer.addEventListener('load', () => {
+            viewer.model.materials.forEach(m => m.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]));
+        });
+
+        // Quiz Submission Logic
+        document.getElementById('quiz-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "SENDING...";
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
+            
+            try {
+                await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
+                document.getElementById('form-state').style.display = 'none';
+                document.getElementById('success-state').style.display = 'block';
+            } catch (err) { alert("Error submitting. Please check your connection."); btn.innerText = "SUBMIT ENTRY"; }
+        };
+    </script>
+</body>
+</html>
