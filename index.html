@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JRK Sculpture | Guess & Win</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        body { margin: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; overflow: hidden; }
+        
+        model-viewer { 
+            width: 100vw; height: 100vh; display: block; 
+            background: radial-gradient(circle, #ffffff 0%, #f0f0f0 100%);
+        }
+
+        /* The Main Action Button */
+        #quiz-trigger {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: #FF6B00; color: white; border: none; padding: 18px 36px;
+            border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4); z-index: 1000; 
+            transition: transform 0.2s ease, background 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+        #quiz-trigger:hover { background: #e66000; }
+        #quiz-trigger:active { transform: translateX(-50%) scale(0.95); }
+
+        /* Modal / Overlay */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Quiz Card */
+        .modal-content {
+            background: white; padding: 35px; border-radius: 30px; width: 88%; max-width: 420px;
+            text-align: center; position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #ccc; transition: 0.2s; }
+        .close-btn:hover { color: #666; }
+
+        input {
+            width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #eee;
+            border-radius: 14px; box-sizing: border-box; font-size: 16px; 
+            background: #fcfcfc; outline-color: #FF6B00;
+        }
+
+        #submit-btn {
+            width: 100%; background: #FF6B00; color: white; border: none;
+            padding: 18px; border-radius: 14px; font-weight: 800; font-size: 16px;
+            margin-top: 15px; cursor: pointer; transition: 0.3s;
+        }
+        #submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        #success-msg { display: none; color: #2ecc71; font-weight: 700; margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <model-viewer id="viewer" src="assembly.glb" ar ar-modes="webxr scene-viewer quick-look" 
+                  camera-controls camera-orbit="auto auto 150%" max-camera-orbit="auto auto 400%"
+                  environment-image="legacy" exposure="1.2" shadow-intensity="2" shadow-softness="0.5">
+        
+        <button id="quiz-trigger">🎁 WIN A REWARD</button>
+
+        <div id="quiz-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-modal">&times;</span>
+                <h2 style="color: #FF6B00; margin: 0 0 8px 0; font-size: 24px;">How Many Parts?</h2>
+                <p style="font-size: 15px; color: #777; margin-bottom: 25px; line-height: 1.4;">
+                    Guess the total number of individual parts in this sculpture for a chance to win!
+                </p>
+                
+                <form id="quiz-form">
+                    <input type="number" name="guess" placeholder="Your Guess (e.g. 25)" required>
+                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" required>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <button type="submit" id="submit-btn">SUBMIT ENTRY</button>
+                </form>
+
+                <div id="success-msg">
+                    🎉 Entry Received!<br>
+                    <span style="font-weight: 400; font-size: 14px; color: #666;">We will contact you if you win.</span>
+                </div>
+            </div>
+        </div>
+    </model-viewer>
+
+    <script>
+        const viewer = document.getElementById('viewer');
+        const modal = document.getElementById('quiz-modal');
+        const trigger = document.getElementById('quiz-trigger');
+        const closeBtn = document.getElementById('close-modal');
+        const form = document.getElementById('quiz-form');
+
+        // Modal Controls
+        trigger.onclick = () => modal.style.display = 'flex';
+        closeBtn.onclick = () => modal.style.display = 'none';
+        
+        // Close modal if user clicks outside the white card
+        window.onclick = (e) => { 
+            if (e.target == modal) modal.style.display = 'none'; 
+        }
+
+        // Form Submission Logic
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const successMsg = document.getElementById('success-msg');
+            
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
+
+            // Integrated Google Apps Script URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
+            
+            const data = new FormData(form);
+
+            try {
+                // Submit to Google Sheets
+                await fetch(scriptURL, { 
+                    method: 'POST', 
+                    body: data,
+                    mode: 'no-cors' // Google Script requires no-cors for simple redirects
+                });
+                
+                // Show success UI
+                form.style.display = 'none';
+                successMsg.style.display = 'block';
+                
+                // Close modal after 3 seconds
+                setTimeout(() => { 
+                    modal.style.display = 'none'; 
+                    // Reset form for next time if needed
+                    form.style.display = 'block';
+                    successMsg.style.display = 'none';
+                    form.reset();
+                    btn.innerText = "SUBMIT ENTRY";
+                    btn.disabled = false;
+                }, 3500);
+
+            } catch (error) {
+                console.error('Error!', error.message);
+                alert("Submission error. Please check your internet and try again.");
+                btn.innerText = "SUBMIT ENTRY";
+                btn.disabled = false;
+            }
+        };
+
+        // Material Visual Polish on Load
+        viewer.addEventListener('load', () => {
+            const materials = viewer.model.materials;
+            materials.forEach(mat => {
+                mat.pbrMetallicRoughness.setRoughnessFactor(0.4);
+            });
+        });
+    </script>
+</body>
+</html>
