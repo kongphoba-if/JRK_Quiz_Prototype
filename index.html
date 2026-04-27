@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JRK Pavilion | Quiz</title>
+    <title>JRK Pavilion | Challenge</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         body { margin: 0; background: #ffffff; font-family: -apple-system, sans-serif; overflow: hidden; }
@@ -12,7 +12,7 @@
         .ui-panel {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.92); padding: 20px; border-radius: 30px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.15); width: 320px; text-align: center; 
+            box-shadow: 0 15px 45px rgba(0,0,0,0.15); width: 340px; text-align: center; 
             z-index: 1000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.4);
         }
@@ -23,21 +23,26 @@
             font-size: 11px; font-weight: 800; cursor: pointer; color: #666; transition: 0.3s; flex: 1;
         }
         .mode-btn.active { background: #000; color: white; }
-        .mode-btn:disabled { opacity: 0.5; cursor: wait; }
+        .mode-btn:disabled { opacity: 0.7; cursor: wait; }
 
         #quiz-trigger {
             width: 100%; background: #FF6B00; color: white; border: none; padding: 16px;
             border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
         }
 
-        /* Modal / Quiz CSS remains the same as before */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-content { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 400px; text-align: center; position: relative; }
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; background: #fcfcfc; }
-        #submit-btn { width: 100%; background: #FF6B00; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 800; margin-top: 15px; cursor: pointer; }
+        .modal-content { background: white; padding: 40px 30px; border-radius: 35px; width: 88%; max-width: 420px; text-align: center; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 22px; font-size: 28px; cursor: pointer; color: #ccc; }
+        
+        input { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #eee; border-radius: 15px; box-sizing: border-box; background: #fcfcfc; font-size: 16px; outline-color: #FF6B00; }
+        #submit-btn { width: 100%; background: #FF6B00; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 800; font-size: 16px; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
+
+    <link rel="prefetch" href="detail.glb">
+    <link rel="prefetch" href="simple.glb">
 
     <model-viewer id="viewer" src="simple.glb" ar ar-modes="webxr scene-viewer quick-look" 
                   camera-controls camera-orbit="auto auto 150%" 
@@ -53,9 +58,15 @@
 
         <div id="quiz-modal" class="modal">
             <div class="modal-content">
-                <h2 style="color: #FF6B00; margin: 0;">How Many Parts?</h2>
+                <span class="close-btn" id="close-modal">&times;</span>
+                <h2 style="color: #FF6B00; margin: 0 0 12px 0; font-size: 22px; line-height: 1.3;">
+                    Guess how many modular pieces were used in this pavilion?
+                </h2>
+                <p style="font-size: 14px; color: #777; margin-bottom: 25px; line-height: 1.5;">
+                    Look closely at the structure! Submit your best guess for a chance to win a special reward.
+                </p>
                 <form id="quiz-form">
-                    <input type="number" name="guess" placeholder="Your Guess" required>
+                    <input type="number" name="guess" placeholder="Your Guess (e.g. 142)" required>
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="tel" name="phone" placeholder="Phone Number" required>
                     <input type="email" name="email" placeholder="Email Address" required>
@@ -69,30 +80,33 @@
         const viewer = document.getElementById('viewer');
         const btnSimple = document.getElementById('btn-simple');
         const btnDetail = document.getElementById('btn-detail');
+        const modal = document.getElementById('quiz-modal');
 
         function switchModel(mode) {
-            // Update UI
             btnSimple.classList.toggle('active', mode === 'simple');
             btnDetail.classList.toggle('active', mode === 'detail');
             
-            // Swap the file source
             const newSrc = mode === 'simple' ? 'simple.glb' : 'detail.glb';
             
             if (viewer.src !== newSrc) {
-                viewer.src = newSrc;
-                // Optional: Disable buttons while loading to prevent glitching
+                // Visual feedback that it's loading
                 btnSimple.disabled = true;
                 btnDetail.disabled = true;
+                btnDetail.innerText = mode === 'detail' ? "LOADING..." : "DETAILED";
+                btnSimple.innerText = mode === 'simple' ? "LOADING..." : "SIMPLIFIED";
+                
+                viewer.src = newSrc;
             }
         }
 
         btnSimple.onclick = () => switchModel('simple');
         btnDetail.onclick = () => switchModel('detail');
 
-        // Re-enable buttons and apply polish whenever a new model finishes loading
         viewer.addEventListener('load', () => {
             btnSimple.disabled = false;
             btnDetail.disabled = false;
+            btnSimple.innerText = "SIMPLIFIED";
+            btnDetail.innerText = "DETAILED";
 
             const materials = viewer.model.materials;
             materials.forEach(m => {
@@ -101,22 +115,30 @@
             });
         });
 
-        // Quiz Logic (Google Sheets)
-        const modal = document.getElementById('quiz-modal');
+        // Modal Controls
         document.getElementById('quiz-trigger').onclick = () => modal.style.display = 'flex';
+        document.getElementById('close-modal').onclick = () => modal.style.display = 'none';
         window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; }
 
+        // Form Submit
         document.getElementById('quiz-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.innerText = "SENDING...";
+            btn.disabled = true;
+            
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxQYJOzlaJfVQjO9BDEVli7gsEwxlc2BOU3SVloMzygtlwXfqSf1h6bQi6218ox5lSh/exec';
+            
             try {
                 await fetch(scriptURL, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
+                alert("Boom! Entry received. Good luck!");
                 modal.style.display = 'none';
-                alert("Success! Entry recorded.");
-            } catch (err) { alert("Error."); }
+                e.target.reset();
+            } catch (err) {
+                alert("Oops! Something went wrong. Try again?");
+            }
             btn.innerText = "SUBMIT ENTRY";
+            btn.disabled = false;
         };
     </script>
 </body>
